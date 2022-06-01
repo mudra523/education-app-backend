@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const { body } = require("express-validator");
 const { validationResult } = require("express-validator/check");
+const stripe = require("stripe")(process.env.STRIP_SECRET_KEY);
 
 const createUser = async (req, res) => {
   const errors = validationResult(req);
@@ -31,6 +32,11 @@ const createUser = async (req, res) => {
       ],
     });
   } else {
+    const customer = await stripe.customers.create({
+      name: firstname + " " + lastname,
+      email,
+    });
+
     user = new User({
       firstname,
       lastname,
@@ -38,6 +44,7 @@ const createUser = async (req, res) => {
       password: encryptedPassword,
       email,
       role: "user",
+      customerId: customer.id,
     });
     user.save((err, data) => {
       if (err) throw err;

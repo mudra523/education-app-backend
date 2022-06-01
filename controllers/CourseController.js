@@ -1,9 +1,11 @@
 const db = require("../config/database");
 const Course = require("../models/Course");
+const Order = require("../models/Order");
 const fs = require("fs");
 
 const createCourse = async (req, res) => {
   const { name, description, author, price, categoryId } = req.body;
+
   const course = await new Course({
     name,
     description,
@@ -11,6 +13,7 @@ const createCourse = async (req, res) => {
     price,
     category_id: categoryId,
     image: req.file.path,
+    active: true,
   });
   course.save((err, data) => {
     if (err) throw err;
@@ -25,25 +28,33 @@ const createCourse = async (req, res) => {
 
 const getAllCourses = async (req, res) => {
   const { key, categoryId } = req.query;
+  const user = req.user;
   let courses = [];
   if (key) {
     courses = await Course.find({
       category_id: categoryId,
-      //   $or: [
-      //     { name: { $regex: ".*" + key + ".*" } },
-      //     { description: { $regex: ".*" + key + ".*" } },
-      //   ],
-    });
+      $or: [
+        { name: { $regex: ".*" + key + ".*" } },
+        { description: { $regex: ".*" + key + ".*" } },
+      ],
+    }).populate({ path: "orders", match: { user: user._id } });
   } else {
-    courses = await Course.find({ category_id: categoryId });
+    courses = await Course.find({ category_id: categoryId }).populate({
+      path: "orders",
+      match: { user: user._id },
+    });
   }
-
   res.status(200).json(courses);
 };
 
 const getCourse = async (req, res) => {
   const { id } = req.params;
-  const course = await Course.findOne({ _id: id });
+  const user = req.user;
+  const course = await Course.findOne({ _id: id }).populate({
+    path: "orders",
+    match: { user: user._id },
+  });
+
   res.status(200).json(course);
 };
 

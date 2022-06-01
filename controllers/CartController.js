@@ -9,6 +9,7 @@ const addToCart = async (req, res) => {
     course: course_id,
     user: user_id,
   });
+
   if (!findInCart) {
     const cart = await new Cart({
       category: category_id,
@@ -44,6 +45,7 @@ const getAllCarts = async (req, res) => {
     .populate("user")
     .populate("course")
     .populate("category");
+
   res.status(200).json(carts);
 };
 

@@ -8,7 +8,10 @@ const CategoryController = require("../controllers/CategoryController");
 const CourseController = require("../controllers/CourseController");
 const ContactUsController = require("../controllers/ContactUsController");
 const CartController = require("../controllers/CartController");
-
+const OrderController = require("../controllers/OrderController");
+const CourseContentController = require("../controllers/CourseContentController");
+const CourseContentDataController = require("../controllers/CourseContentDataController");
+const stripe = require("stripe")(process.env.STRIP_SECRET_KEY);
 // Register
 router.post(
   "/register",
@@ -73,10 +76,68 @@ router.put(
 );
 router.delete("/course/delete/:id", auth, CourseController.deleteCourse);
 
+// CourseContent
+router.post(
+  "/course/content/create",
+  auth,
+  CourseContentController.createCourseContent
+);
+router.get(
+  "/coursecontents",
+  auth,
+  CourseContentController.getAllCourseContents
+);
+router.get(
+  "/course/content/:id",
+  auth,
+  CourseContentController.getCourseContent
+);
+router.put(
+  "/course/content/edit/:id",
+  auth,
+  CourseContentController.updateCourseContent
+);
+router.delete(
+  "/course/content/delete/:id",
+  auth,
+  CourseContentController.deleteCourseContent
+);
+
+// CourseContentData
+router.post(
+  "/course/contentdata/create",
+  auth,
+  CourseContentDataController.createCourseContenData
+);
+// router.get(
+//   "/coursecontentdatas",
+//   auth,
+//   CourseContentDataController.getAllCourseContentData
+// );
+router.get(
+  "/course/contentdata/:id",
+  auth,
+  CourseContentDataController.getCourseContentData
+);
+router.put(
+  "/course/contentdata/edit/:id",
+  auth,
+  CourseContentDataController.updateCourseContentData
+);
+router.delete(
+  "/course/contentdata/delete/:id",
+  auth,
+  CourseContentDataController.deleteCourseContentData
+);
+
 // Cart
 router.post("/cart/add", auth, CartController.addToCart);
 router.get("/carts", auth, CartController.getAllCarts);
 router.get("/cart/:id", auth, CartController.getCart);
 router.delete("/cart/remove/:id", auth, CartController.removeToCart);
+
+// strip
+router.post("/create-checkout-session", auth, OrderController.allCheckout);
+router.get("/orders", auth, OrderController.getAllOrder);
 
 module.exports = router;
