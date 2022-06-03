@@ -43,7 +43,9 @@ const getAllCarts = async (req, res) => {
   const { user } = req;
   const carts = await Cart.find({ user: user._id })
     .populate("user")
-    .populate("course")
+    .populate({
+      path: "course",
+    })
     .populate("category");
 
   res.status(200).json(carts);

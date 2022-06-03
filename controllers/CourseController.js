@@ -34,8 +34,8 @@ const getAllCourses = async (req, res) => {
     courses = await Course.find({
       category_id: categoryId,
       $or: [
-        { name: { $regex: ".*" + key + ".*" } },
-        { description: { $regex: ".*" + key + ".*" } },
+        { name: { $regex: ".*" + key + ".*", $options: "i" } },
+        { description: { $regex: ".*" + key + ".*", $options: "i" } },
       ],
     }).populate({ path: "orders", match: { user: user._id } });
   } else {
